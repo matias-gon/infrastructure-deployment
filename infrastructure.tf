@@ -7,28 +7,10 @@ terraform {
     }
   }
 }
-# Define the regions
-/* variable "regions" {
-  type    = list(string)
-  default = ["au", "uk", "us"]
-}
-
-# Define the environments
-variable "environments" {
-  type    = list(string)
-  default = ["production", "testing"]
-} */
 
 variable "environments" {
   type    = list(string)
   default = ["production", "testing"]
-}
-
-module "permission" {
-  providers = {
-    aws = aws.AU
-  }
-  source = "./modules/Permission"
 }
 
 module "vpc-au" {
@@ -43,6 +25,16 @@ module "vpc-au" {
   private_subnet_cidr_block = "10.1.2.0/24"
 }
 
+module "permission-au" {
+  providers = {
+    aws = aws.US
+  }
+  source = "./modules/Permission"
+  for_each = toset(var.environments)
+  region = "au"
+  enviroment = each.value
+}
+
  module "ec2-au"{
   providers = {
     aws = aws.AU
@@ -54,7 +46,7 @@ module "vpc-au" {
   vpc_id = module.vpc-au[each.value].vpc_id
   private_subnet_id = module.vpc-au[each.value].private_subnet_id
   public_subnet_id = module.vpc-au[each.value].public_subnet_id
-  iam_instance_profile = module.permission.aws_iam_instance_profile_id
+  iam_instance_profile = module.permission-au[each.value].aws_iam_instance_profile_id
 }
 
 module "vpc-uk" {
@@ -69,7 +61,17 @@ module "vpc-uk" {
   private_subnet_cidr_block = "10.2.2.0/24"
 }
 
- module "ec2-uk"{
+module "permission-uk" {
+  providers = {
+    aws = aws.US
+  }
+  source = "./modules/Permission"
+  for_each = toset(var.environments)
+  region = "uk"
+  enviroment = each.value
+}
+
+module "ec2-uk"{
   providers = {
     aws = aws.UK
   }
@@ -80,7 +82,7 @@ module "vpc-uk" {
   vpc_id = module.vpc-uk[each.value].vpc_id
   private_subnet_id = module.vpc-uk[each.value].private_subnet_id
   public_subnet_id = module.vpc-uk[each.value].public_subnet_id
-  iam_instance_profile = module.permission.aws_iam_instance_profile_id
+  iam_instance_profile = module.permission-uk[each.value].aws_iam_instance_profile_id
 }
 
 module "vpc-us" {
@@ -95,6 +97,16 @@ module "vpc-us" {
   private_subnet_cidr_block = "10.3.2.0/24"
 }
 
+module "permission-us" {
+  providers = {
+    aws = aws.US
+  }
+  source = "./modules/Permission"
+  for_each = toset(var.environments)
+  region = "us"
+  enviroment = each.value
+}
+
  module "ec2-us"{
   providers = {
     aws = aws.US
@@ -106,5 +118,5 @@ module "vpc-us" {
   vpc_id = module.vpc-us[each.value].vpc_id
   private_subnet_id = module.vpc-us[each.value].private_subnet_id
   public_subnet_id = module.vpc-us[each.value].public_subnet_id
-  iam_instance_profile = module.permission.aws_iam_instance_profile_id
+  iam_instance_profile = module.permission-us[each.value].aws_iam_instance_profile_id
 }

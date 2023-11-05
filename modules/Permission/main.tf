@@ -7,72 +7,50 @@ terraform {
       }
     }
 
-data "aws_iam_policy_document" "ec2" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
+resource "random_id" "example" {
+  byte_length = 8
+}
+
+resource "aws_s3_bucket" "bucket" {
+  bucket = "${var.region}-${var.enviroment}-${random_id.example.hex}"
+
+  tags = {
+    Name        = "${var.region}-${var.enviroment}-${random_id.example.hex}"
+    Environment = "${var.enviroment}"
   }
 }
 
-resource "aws_iam_policy" "session-manager" {
-  description = "session-manager"
-  name        = "session-manager"
+resource "aws_iam_policy" "bucket-rw-access" {
+  description = "bucket-rw-access-${var.region}-${var.enviroment}"
+  name        = "bucket-rw-access-${var.region}-${var.enviroment}"
   policy      = jsonencode({
     "Version":"2012-10-17",
     "Statement":[
       {
-        "Action": "ec2:*",
+        "Sid": "ListObjectsInBucket",
         "Effect": "Allow",
-        "Resource": "*"
+        "Action": ["s3:ListBucket"],
+        "Resource": ["${aws_s3_bucket.bucket.arn}"]
       },
-        {
-            "Effect": "Allow",
-            "Action": "elasticloadbalancing:*",
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "cloudwatch:*",
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "autoscaling:*",
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "iam:CreateServiceLinkedRole",
-            "Resource": "*",
-            "Condition": {
-                "StringEquals": {
-                    "iam:AWSServiceName": [
-                        "autoscaling.amazonaws.com",
-                        "ec2scheduled.amazonaws.com",
-                        "elasticloadbalancing.amazonaws.com",
-                        "spot.amazonaws.com",
-                        "spotfleet.amazonaws.com",
-                        "transitgateway.amazonaws.com"
-                    ]
-                }
-            }
-        }
+      {
+        "Sid": "AllObjectActions",
+        "Effect": "Allow",
+        "Action": "s3:*Object",
+        "Resource": ["${aws_s3_bucket.bucket.arn}/*"]
+      }
     ]
   })
 }
 
-resource "aws_iam_role" "session-manager" {
-  assume_role_policy = data.aws_iam_policy_document.ec2.json
-  name               = "session-manager"
+ resource "aws_iam_role" "role-bucket-access" {
+  assume_role_policy = aws_iam_policy.bucket-rw-access.policy
+  name               = "role-bucket-access-${var.region}-${var.enviroment}"
   tags = {
-    Name = "session-manager"
+    Name = "role-bucket-access-${var.region}-${var.enviroment}"
   }
 }
 
-resource "aws_iam_instance_profile" "session-manager" {
-  name  = "session-manager"
-  role  = aws_iam_role.session-manager.name
+resource "aws_iam_instance_profile" "ec2-instance-profile" {
+  name  = "bucket-access-${var.region}-${var.enviroment}"
+  role  = aws_iam_role.role-bucket-access.name
 }
