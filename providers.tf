@@ -1,14 +1,14 @@
 provider "aws" {
   region = "ap-southeast-2"
-  alias = "AU"
+  alias  = "AU"
 }
-    
+
 provider "aws" {
   region = "eu-west-2"
-  alias = "UK"
+  alias  = "UK"
 }
 
 provider "aws" {
   region = "us-west-2"
-  alias = "US"
+  alias  = "US"
 }

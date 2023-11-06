@@ -1,22 +1,22 @@
 terraform {
-    required_providers {
+  required_providers {
     aws = {
-           source  = "hashicorp/aws"
-           version = "~> 5.0"
-        }
-      }
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
+  }
+}
 
 data "aws_ami" "ami" {
-  most_recent      = true
+  most_recent = true
 
   filter {
-       name   = "name"
-       values = ["Windows_Server-2019-English-Full-Base-*"]  
+    name   = "name"
+    values = ["Windows_Server-2019-English-Full-Base-*"]
   }
   filter {
-       name   = "virtualization-type"
-       values = ["hvm"]  
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
 }
 
@@ -54,13 +54,6 @@ resource "aws_security_group" "ec2" {
     security_groups = [aws_security_group.load-balancer.id]
   }
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -74,7 +67,7 @@ variable "ssh_pubkey_file" {
   default     = "~/.ssh/k0s.pub"
 }
 
-resource "aws_key_pair" "terraform-lab" {
+resource "aws_key_pair" "ec2-windows-server-key" {
   key_name   = "${var.ec2_instance_name}_key_pair"
   public_key = file(var.ssh_pubkey_file)
 }
@@ -82,12 +75,12 @@ resource "aws_key_pair" "terraform-lab" {
 resource "aws_launch_configuration" "ec2" {
   name                        = "${var.ec2_instance_name}-instances-lc"
   image_id                    = data.aws_ami.ami.id
-  instance_type               = "${var.ec2_instance_type}"
+  instance_type               = var.ec2_instance_type
   security_groups             = [aws_security_group.ec2.id]
-  key_name                    = aws_key_pair.terraform-lab.key_name
+  key_name                    = aws_key_pair.ec2-windows-server-key.key_name
   iam_instance_profile        = var.iam_instance_profile
   associate_public_ip_address = false
-/*   user_data = <<-EOL
+  /*   user_data = <<-EOL
   #!/bin/bash -xe
   sudo yum update -y
   sudo yum -y install docker

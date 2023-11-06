@@ -1,14 +1,14 @@
-variable ec2_instance_name {}
+variable "ec2_instance_name" {}
 
-variable ec2_instance_type {}
+variable "ec2_instance_type" {}
 
-variable vpc_id {}
+variable "vpc_id" {}
 
-variable private_subnet_id {}
+variable "private_subnet_id" {}
 
-variable public_subnet_id {}
+variable "public_subnet_id" {}
 
-variable iam_instance_profile {}
+variable "iam_instance_profile" {}
 
 variable "health_check_path" {
   description = "Health check path for the default target group"

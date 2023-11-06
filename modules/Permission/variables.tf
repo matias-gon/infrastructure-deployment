@@ -1,3 +1,3 @@
-variable region {}
+variable "region" {}
 
-variable enviroment {}
+variable "enviroment" {}

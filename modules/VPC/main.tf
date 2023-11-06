@@ -1,14 +1,14 @@
 terraform {
-    required_providers {
+  required_providers {
     aws = {
-           source  = "hashicorp/aws"
-           version = "~> 5.0"
-        }
-      }
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
+  }
+}
 
 resource "aws_vpc" "vpc" {
-  cidr_block = var.cidr_block # Replace with your desired CIDR block
+  cidr_block           = var.cidr_block # Replace with your desired CIDR block
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
@@ -43,8 +43,8 @@ resource "aws_internet_gateway" "igw" {
 }
 
 resource "aws_eip" "nat_gateway" {
-  domain = "vpc"
-  depends_on                = [aws_internet_gateway.igw]
+  domain     = "vpc"
+  depends_on = [aws_internet_gateway.igw]
 }
 resource "aws_nat_gateway" "ngw" {
   allocation_id = aws_eip.nat_gateway.id
