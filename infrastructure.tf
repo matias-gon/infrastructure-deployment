@@ -10,7 +10,7 @@ terraform {
 
 variable "environments" {
   type    = list(string)
-  default = ["production", "testing"]
+  default = ["production"]#, "testing"]
 }
 
 module "vpc-au" {
@@ -21,8 +21,8 @@ module "vpc-au" {
   source                    = "./modules/VPC"
   vpc_name                  = "vpc-${each.value}"
   cidr_block                = "10.1.0.0/16"
-  public_subnet_cidr_block  = "10.1.1.0/24"
-  private_subnet_cidr_block = "10.1.2.0/24"
+  public_subnet_cidr_block  = ["10.1.1.0/24","10.1.2.0/24"]
+  private_subnet_cidr_block = ["10.1.3.0/24","10.1.4.0/24"]
 }
 
 module "permission-au" {
@@ -44,8 +44,8 @@ module "ec2-au" {
   ec2_instance_name    = "ec2-${each.value}"
   ec2_instance_type    = "t2.micro"
   vpc_id               = module.vpc-au[each.value].vpc_id
-  private_subnet_id    = module.vpc-au[each.value].private_subnet_id
-  public_subnet_id     = module.vpc-au[each.value].public_subnet_id
+  private_subnet_ids    = module.vpc-au[each.value].private_subnet_ids
+  public_subnet_ids     = module.vpc-au[each.value].public_subnet_ids
   iam_instance_profile = module.permission-au[each.value].aws_iam_instance_profile_id
 }
 
@@ -57,8 +57,8 @@ module "vpc-uk" {
   source                    = "./modules/VPC"
   vpc_name                  = "vpc-${each.value}"
   cidr_block                = "10.2.0.0/16"
-  public_subnet_cidr_block  = "10.2.1.0/24"
-  private_subnet_cidr_block = "10.2.2.0/24"
+  public_subnet_cidr_block  = ["10.2.1.0/24","10.2.2.0/24"]
+  private_subnet_cidr_block = ["10.2.3.0/24","10.2.4.0/24"]
 }
 
 module "permission-uk" {
@@ -80,8 +80,8 @@ module "ec2-uk" {
   ec2_instance_name    = "ec2-${each.value}"
   ec2_instance_type    = "t2.micro"
   vpc_id               = module.vpc-uk[each.value].vpc_id
-  private_subnet_id    = module.vpc-uk[each.value].private_subnet_id
-  public_subnet_id     = module.vpc-uk[each.value].public_subnet_id
+  private_subnet_ids   = module.vpc-uk[each.value].private_subnet_ids
+  public_subnet_ids    = module.vpc-uk[each.value].public_subnet_ids
   iam_instance_profile = module.permission-uk[each.value].aws_iam_instance_profile_id
 }
 
@@ -93,8 +93,8 @@ module "vpc-us" {
   source                    = "./modules/VPC"
   vpc_name                  = "vpc-${each.value}"
   cidr_block                = "10.3.0.0/16"
-  public_subnet_cidr_block  = "10.3.1.0/24"
-  private_subnet_cidr_block = "10.3.2.0/24"
+  public_subnet_cidr_block  = ["10.3.1.0/24","10.3.2.0/24"]
+  private_subnet_cidr_block = ["10.3.3.0/24","10.3.4.0/24"]
 }
 
 module "permission-us" {
@@ -116,7 +116,7 @@ module "ec2-us" {
   ec2_instance_name    = "ec2-${each.value}"
   ec2_instance_type    = "t2.micro"
   vpc_id               = module.vpc-us[each.value].vpc_id
-  private_subnet_id    = module.vpc-us[each.value].private_subnet_id
-  public_subnet_id     = module.vpc-us[each.value].public_subnet_id
+  private_subnet_ids   = module.vpc-us[each.value].private_subnet_ids
+  public_subnet_ids    = module.vpc-us[each.value].public_subnet_ids
   iam_instance_profile = module.permission-us[each.value].aws_iam_instance_profile_id
 }

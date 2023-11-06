@@ -80,17 +80,16 @@ resource "aws_launch_configuration" "ec2" {
   key_name                    = aws_key_pair.ec2-windows-server-key.key_name
   iam_instance_profile        = var.iam_instance_profile
   associate_public_ip_address = false
-  /*   user_data = <<-EOL
-  #!/bin/bash -xe
-  sudo yum update -y
-  sudo yum -y install docker
-  sudo service docker start
-  sudo usermod -a -G docker ec2-user
-  sudo chmod 666 /var/run/docker.sock
-  docker pull nginx
-  docker tag nginx my-nginx
-  docker run --rm --name nginx-server -d -p 80:80 -t my-nginx
-  EOL */
+  root_block_device {
+    volume_size = 30
+    volume_type = "gp2"
+  }
+  user_data = <<-EOL
+  <powershell>
+  # Install IIS
+  Install-WindowsFeature -name Web-Server -IncludeManagementTools;
+  </powershell>
+  EOL
 }
 
 resource "aws_lb" "terraform-lab" {
@@ -98,7 +97,7 @@ resource "aws_lb" "terraform-lab" {
   load_balancer_type = "application"
   internal           = false
   security_groups    = [aws_security_group.load-balancer.id]
-  subnets            = [var.public_subnet_id]
+  subnets            = var.public_subnet_ids
 }
 
 # Target group
@@ -126,6 +125,6 @@ resource "aws_autoscaling_group" "ec2-cluster" {
   desired_capacity     = var.autoscale_desired
   health_check_type    = "EC2"
   launch_configuration = aws_launch_configuration.ec2.name
-  vpc_zone_identifier  = [var.private_subnet_id]
+  vpc_zone_identifier  = var.private_subnet_ids
   target_group_arns    = [aws_alb_target_group.default-target-group.arn]
 }

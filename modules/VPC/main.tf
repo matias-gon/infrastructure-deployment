@@ -20,18 +20,36 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-resource "aws_subnet" "public_subnet" {
+resource "aws_subnet" "public-subnet-1" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.public_subnet_cidr_block # Replace with your desired CIDR block
+  cidr_block        = var.public_subnet_cidr_block[0] # Replace with your desired CIDR block
   availability_zone = data.aws_availability_zones.available.names[0]
   tags = {
     Name = "public_subnet"
   }
 }
 
-resource "aws_subnet" "private_subnet" {
+resource "aws_subnet" "public-subnet-2" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.private_subnet_cidr_block # Replace with your desired CIDR block
+  cidr_block        = var.public_subnet_cidr_block[1] # Replace with your desired CIDR block
+  availability_zone = data.aws_availability_zones.available.names[1]
+  tags = {
+    Name = "public_subnet"
+  }
+}
+
+resource "aws_subnet" "private-subnet-1" {
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.private_subnet_cidr_block[0] # Replace with your desired CIDR block
+  availability_zone = data.aws_availability_zones.available.names[0]
+  tags = {
+    Name = "private_subnet"
+  }
+}
+
+resource "aws_subnet" "private-subnet-2" {
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.private_subnet_cidr_block[1] # Replace with your desired CIDR block
   availability_zone = data.aws_availability_zones.available.names[0]
   tags = {
     Name = "private_subnet"
@@ -48,7 +66,7 @@ resource "aws_eip" "nat_gateway" {
 }
 resource "aws_nat_gateway" "ngw" {
   allocation_id = aws_eip.nat_gateway.id
-  subnet_id     = aws_subnet.public_subnet.id
+  subnet_id     = aws_subnet.public-subnet-1.id
 
   tags = {
     Name = "NAT Gateway"
@@ -84,13 +102,23 @@ resource "aws_route" "nat-ngw-route" {
 }
 
 # Associate the public subnet with the public route table
-resource "aws_route_table_association" "public-route-table-assoc" {
-  subnet_id      = aws_subnet.public_subnet.id
+resource "aws_route_table_association" "public-route-table-assoc-1" {
+  subnet_id      = aws_subnet.public-subnet-1.id
+  route_table_id = aws_route_table.public-route-table.id
+}
+
+resource "aws_route_table_association" "public-route-table-assoc-2" {
+  subnet_id      = aws_subnet.public-subnet-2.id
   route_table_id = aws_route_table.public-route-table.id
 }
 
 # Associate the private subnet with the private route table
+resource "aws_route_table_association" "private-route-table-assoc-1" {
+  subnet_id      = aws_subnet.private-subnet-1.id
+  route_table_id = aws_route_table.private-route-table.id
+}
+
 resource "aws_route_table_association" "private-route-table-assoc" {
-  subnet_id      = aws_subnet.private_subnet.id
+  subnet_id      = aws_subnet.private-subnet-2.id
   route_table_id = aws_route_table.private-route-table.id
 }
