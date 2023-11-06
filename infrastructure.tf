@@ -10,7 +10,7 @@ terraform {
 
 variable "environments" {
   type    = list(string)
-  default = ["production"], "testing"]
+  default = ["production", "testing"]
 }
 
 module "vpc-au" {
