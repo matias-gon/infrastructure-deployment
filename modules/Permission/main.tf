@@ -20,53 +20,6 @@ resource "aws_s3_bucket" "bucket" {
   }
 }
 
-/* resource "aws_iam_policy" "session-manager" {
-  description = "session-manager"
-  name        = "session-manager"
-  policy      = jsonencode({
-    "Version":"2012-10-17",
-    "Statement":[
-      {
-        "Action": "ec2:*",
-        "Effect": "Allow",
-        "Resource": "*"
-      },
-        {
-            "Effect": "Allow",
-            "Action": "elasticloadbalancing:*",
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "cloudwatch:*",
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "autoscaling:*",
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "iam:CreateServiceLinkedRole",
-            "Resource": "*",
-            "Condition": {
-                "StringEquals": {
-                    "iam:AWSServiceName": [
-                        "autoscaling.amazonaws.com",
-                        "ec2scheduled.amazonaws.com",
-                        "elasticloadbalancing.amazonaws.com",
-                        "spot.amazonaws.com",
-                        "spotfleet.amazonaws.com",
-                        "transitgateway.amazonaws.com"
-                    ]
-                }
-            }
-        }
-    ]
-  })
-}
- */
 resource "aws_iam_policy" "bucket-rw-access" {
   description = "bucket-rw-access-${var.region}-${var.enviroment}"
   name        = "bucket-rw-access-${var.region}-${var.enviroment}"

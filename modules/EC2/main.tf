@@ -21,7 +21,7 @@ data "aws_ami" "ami" {
 }
 
 # ALB Security Group (Traffic Internet -> ALB)
-resource "aws_security_group" "load-balancer" {
+resource "aws_security_group" "load-balancer-sg" {
   name        = "load_balancer_security_group"
   description = "Controls access to the ALB"
   vpc_id      = var.vpc_id
@@ -42,7 +42,7 @@ resource "aws_security_group" "load-balancer" {
 }
 
 # Instance Security group (traffic ALB -> EC2, ssh -> EC2)
-resource "aws_security_group" "ec2" {
+resource "aws_security_group" "ec2-sg" {
   name        = "ec2_security_group"
   description = "Allows inbound access from the ALB only"
   vpc_id      = var.vpc_id
@@ -51,7 +51,7 @@ resource "aws_security_group" "ec2" {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    security_groups = [aws_security_group.load-balancer.id]
+    security_groups = [aws_security_group.load-balancer-sg.id]
   }
 
   egress {
@@ -76,7 +76,7 @@ resource "aws_launch_configuration" "ec2" {
   name                        = "${var.ec2_instance_name}-instances-lc"
   image_id                    = data.aws_ami.ami.id
   instance_type               = var.ec2_instance_type
-  security_groups             = [aws_security_group.ec2.id]
+  security_groups             = [aws_security_group.ec2-sg.id]
   key_name                    = aws_key_pair.ec2-windows-server-key.key_name
   iam_instance_profile        = var.iam_instance_profile
   associate_public_ip_address = false
@@ -90,14 +90,6 @@ resource "aws_launch_configuration" "ec2" {
   Install-WindowsFeature -name Web-Server -IncludeManagementTools;
   </powershell>
   EOL
-}
-
-resource "aws_lb" "terraform-lab" {
-  name               = "${var.ec2_instance_name}-alb"
-  load_balancer_type = "application"
-  internal           = false
-  security_groups    = [aws_security_group.load-balancer.id]
-  subnets            = var.public_subnet_ids
 }
 
 # Target group
@@ -115,6 +107,23 @@ resource "aws_alb_target_group" "default-target-group" {
     timeout             = 2
     interval            = 60
     matcher             = "200"
+  }
+}
+
+resource "aws_lb" "application-load-balancer" {
+  name               = "${var.ec2_instance_name}-alb"
+  load_balancer_type = "application"
+  internal           = false
+  security_groups    = [aws_security_group.load-balancer-sg.id]
+  subnets            = var.public_subnet_ids
+}
+
+resource "aws_lb_listener" "front_end" {
+  load_balancer_arn = aws_lb.application-load-balancer.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_alb_target_group.default-target-group.arn
   }
 }
 
