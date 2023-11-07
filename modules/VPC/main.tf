@@ -7,6 +7,7 @@ terraform {
   }
 }
 
+# VPC per enviroment
 resource "aws_vpc" "vpc" {
   cidr_block           = var.cidr_block # Replace with your desired CIDR block
   enable_dns_support   = true
@@ -16,10 +17,12 @@ resource "aws_vpc" "vpc" {
   }
 }
 
+# Search for AZs available in the region
 data "aws_availability_zones" "available" {
   state = "available"
 }
 
+# Create public and private subnets
 resource "aws_subnet" "public_subnet_1" {
   vpc_id            = aws_vpc.vpc.id
   cidr_block        = var.public_subnet_cidr_blocks[0] # Replace with your desired CIDR block
@@ -56,6 +59,7 @@ resource "aws_subnet" "private_subnet_2" {
   }
 }
 
+# Create Internet Gateway and NAT Gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 }
@@ -67,13 +71,13 @@ resource "aws_eip" "nat_gateway" {
 resource "aws_nat_gateway" "ngw" {
   allocation_id = aws_eip.nat_gateway.id
   subnet_id     = aws_subnet.public_subnet_1.id
-
   tags = {
     Name = "NAT Gateway"
   }
   depends_on = [aws_eip.nat_gateway]
 }
 
+# Create public and private route tables
 resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.vpc.id
   tags = {
@@ -101,7 +105,7 @@ resource "aws_route" "nat_ngw_route" {
   destination_cidr_block = "0.0.0.0/0"
 }
 
-# Associate the public subnet with the public route table
+# Associate the public subnets with the public route table
 resource "aws_route_table_association" "public_route_table_assoc_1" {
   subnet_id      = aws_subnet.public_subnet_1.id
   route_table_id = aws_route_table.public_route_table.id
@@ -112,7 +116,7 @@ resource "aws_route_table_association" "public_route_table_assoc_2" {
   route_table_id = aws_route_table.public_route_table.id
 }
 
-# Associate the private subnet with the private route table
+# Associate the private subnets with the private route table
 resource "aws_route_table_association" "private_route_table_assoc_1" {
   subnet_id      = aws_subnet.private_subnet_1.id
   route_table_id = aws_route_table.private_route_table.id

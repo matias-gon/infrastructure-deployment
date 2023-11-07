@@ -7,10 +7,12 @@ terraform {
   }
 }
 
+# Random number for S3 bucket creation
 resource "random_id" "example" {
   byte_length = 8
 }
 
+# S3 bucket
 resource "aws_s3_bucket" "bucket" {
   bucket = "${var.region}-${var.enviroment}-${random_id.example.hex}"
 
@@ -20,6 +22,7 @@ resource "aws_s3_bucket" "bucket" {
   }
 }
 
+# IAM polcity for S3 bucket access
 resource "aws_iam_policy" "bucket_rw_access" {
   description = "bucket-rw-access-${var.region}-${var.enviroment}"
   name        = "bucket-rw-access-${var.region}-${var.enviroment}"
@@ -43,6 +46,7 @@ resource "aws_iam_policy" "bucket_rw_access" {
   )
 }
 
+# IAM assume role for EC2 instance
 data "aws_iam_policy_document" "ec2_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -54,6 +58,7 @@ data "aws_iam_policy_document" "ec2_assume_role" {
   }
 }
 
+# IAM role for EC2 instance
 resource "aws_iam_role" "role_bucket_access" {
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
   name               = "role-bucket-access-${var.region}-${var.enviroment}"
@@ -109,11 +114,13 @@ resource "aws_iam_role" "role_bucket_access" {
   }
 }
 
+# IAM role policy attachment
 resource "aws_iam_role_policy_attachment" "role_attachment" {
   role       = aws_iam_role.role_bucket_access.name
   policy_arn = aws_iam_policy.bucket_rw_access.arn
 }
 
+# IAM instance profile
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "bucket-access-${var.region}-${var.enviroment}"
   role = aws_iam_role.role_bucket_access.name

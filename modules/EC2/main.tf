@@ -7,6 +7,7 @@ terraform {
   }
 }
 
+# AMI search for Windows Server 2019 Base
 data "aws_ami" "ami" {
   most_recent = true
 
@@ -62,16 +63,19 @@ resource "aws_security_group" "ec2_sg" {
   }
 }
 
+# pub File for AWS Key Pair
 variable "ssh_pubkey_file" {
   description = "Path to an SSH public key"
   default     = "~/.ssh/key.pub"
 }
 
+# Key Pair resource
 resource "aws_key_pair" "ec2_windows_server_key" {
   key_name   = "${var.ec2_instance_name}_key_pair"
   public_key = file(var.ssh_pubkey_file)
 }
 
+# Launch Configuration
 resource "aws_launch_configuration" "ec2" {
   name                        = "${var.ec2_instance_name}-instances-lc"
   image_id                    = data.aws_ami.ami.id
@@ -110,6 +114,7 @@ resource "aws_alb_target_group" "default_target_group" {
   }
 }
 
+# Application Load Balancer
 resource "aws_lb" "application_load_balancer" {
   name               = "${var.ec2_instance_name}-alb"
   load_balancer_type = "application"
@@ -118,6 +123,7 @@ resource "aws_lb" "application_load_balancer" {
   subnets            = var.public_subnet_ids
 }
 
+# Application Load Balancer Listener
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.application_load_balancer.arn
 
@@ -127,6 +133,7 @@ resource "aws_lb_listener" "front_end" {
   }
 }
 
+# Auto Scaling Group
 resource "aws_autoscaling_group" "ec2_cluster" {
   name                 = "${var.ec2_instance_name}_auto_scaling_group"
   min_size             = var.autoscale_min
