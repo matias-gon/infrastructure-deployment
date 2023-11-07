@@ -12,6 +12,7 @@ This repository contains Terraform configurations to set up a basic AWS environm
 - AWS Account with read and write access to Dynamodb table where state lock is storage. [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#dynamodb-table-permissions)
 - Terraform v1.0 or newer
 - AWS CLI configured with access key, secret key, and a default region
+- Public key file key.pub
 
 *Structure*
 The repository is organized with the following directory structure:
