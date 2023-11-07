@@ -41,6 +41,12 @@ Apply the Configuration: Apply the Terraform configuration to create the infrast
 terraform apply
 ```
 
+Outputs: Get the DNS names of the Application Load Balancer.
+
+```
+terraform output
+```
+
 *Architecture Design Decisions*
 - Region-Specific Providers: Different AWS providers are configured for each AWS region to comply with the multi-region requirement.
 - Reusable Modules: The VPC, EC2, and S3 components are abstracted into modules for code reusability and better organization.
