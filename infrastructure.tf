@@ -14,11 +14,13 @@ variable "environments" {
 }
 
 module "vpc_au" {
+  for_each                   = toset(var.environments)
+  
   providers = {
     aws = aws.AU
   }
-  for_each                   = toset(var.environments)
   source                     = "./modules/VPC"
+
   vpc_name                   = "vpc-${each.value}"
   cidr_block                 = "10.1.0.0/16"
   public_subnet_cidr_blocks  = ["10.1.1.0/24", "10.1.2.0/24"]
@@ -26,21 +28,25 @@ module "vpc_au" {
 }
 
 module "permission_au" {
+  for_each   = toset(var.environments)
+  
   providers = {
     aws = aws.US
   }
   source     = "./modules/Permission"
-  for_each   = toset(var.environments)
+
   region     = "au"
   enviroment = each.value
 }
 
 module "ec2_au" {
+  for_each             = toset(var.environments)
+  
   providers = {
     aws = aws.AU
   }
   source               = "./modules/EC2"
-  for_each             = toset(var.environments)
+  
   ec2_instance_name    = "ec2-${each.value}"
   ec2_instance_type    = "t2.micro"
   vpc_id               = module.vpc_au[each.value].vpc_id
@@ -50,11 +56,13 @@ module "ec2_au" {
 }
 
 module "vpc_uk" {
+  for_each                   = toset(var.environments)
+  
   providers = {
     aws = aws.UK
   }
-  for_each                   = toset(var.environments)
   source                     = "./modules/VPC"
+  
   vpc_name                   = "vpc-${each.value}"
   cidr_block                 = "10.2.0.0/16"
   public_subnet_cidr_blocks  = ["10.2.1.0/24", "10.2.2.0/24"]
@@ -62,21 +70,25 @@ module "vpc_uk" {
 }
 
 module "permission_uk" {
+  for_each   = toset(var.environments)
+
   providers = {
     aws = aws.US
   }
   source     = "./modules/Permission"
-  for_each   = toset(var.environments)
+  
   region     = "uk"
   enviroment = each.value
 }
 
 module "ec2_uk" {
+  for_each             = toset(var.environments)
+  
   providers = {
     aws = aws.UK
   }
   source               = "./modules/EC2"
-  for_each             = toset(var.environments)
+  
   ec2_instance_name    = "ec2-${each.value}"
   ec2_instance_type    = "t2.micro"
   vpc_id               = module.vpc_uk[each.value].vpc_id
@@ -86,11 +98,13 @@ module "ec2_uk" {
 }
 
 module "vpc_us" {
+  for_each                   = toset(var.environments)
+
   providers = {
     aws = aws.US
   }
-  for_each                   = toset(var.environments)
   source                     = "./modules/VPC"
+  
   vpc_name                   = "vpc-${each.value}"
   cidr_block                 = "10.3.0.0/16"
   public_subnet_cidr_blocks  = ["10.3.1.0/24", "10.3.2.0/24"]
@@ -98,21 +112,25 @@ module "vpc_us" {
 }
 
 module "permission_us" {
+  for_each   = toset(var.environments)
+  
   providers = {
     aws = aws.US
   }
   source     = "./modules/Permission"
-  for_each   = toset(var.environments)
+  
   region     = "us"
   enviroment = each.value
 }
 
 module "ec2_us" {
+  for_each             = toset(var.environments)
+
   providers = {
     aws = aws.US
   }
   source               = "./modules/EC2"
-  for_each             = toset(var.environments)
+  
   ec2_instance_name    = "ec2-${each.value}"
   ec2_instance_type    = "t2.micro"
   vpc_id               = module.vpc_us[each.value].vpc_id
