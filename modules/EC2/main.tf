@@ -85,7 +85,7 @@ resource "aws_launch_configuration" "ec2" {
   iam_instance_profile        = var.iam_instance_profile
   associate_public_ip_address = false
   root_block_device {
-    volume_size = 30
+    volume_size = 30 # It does not allow define a size lesser than 30
     volume_type = "gp2"
   }
   user_data = <<-EOL
@@ -126,6 +126,8 @@ resource "aws_lb" "application_load_balancer" {
 # Application Load Balancer Listener
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.application_load_balancer.arn
+  port              = "80"
+  protocol          = "HTTP"
 
   default_action {
     type             = "forward"

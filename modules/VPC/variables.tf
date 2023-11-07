@@ -1,6 +1,6 @@
-variable "vpc_name" {
-  description = "The name of the VPC"
-  default     = "vpc"
+variable enviroment {
+  description = "Enviroment"
+  default     = "dev"
 }
 
 variable "cidr_block" {

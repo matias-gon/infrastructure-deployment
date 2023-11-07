@@ -13,6 +13,19 @@ variable "environments" {
   default = ["production", "testing"]
 }
 
+# VPC CIDR Blocks for each region and enviroment
+variable "vpc_cidr_blocks" {
+  type    = map(string)
+  default = {
+    "AU-production" = "10.1.0.0/16"
+    "AU-testing"    = "10.2.0.0/16"
+    "UK-production" = "10.3.0.0/16"
+    "UK-testing"    = "10.4.0.0/16"
+    "US-production" = "10.5.0.0/16"
+    "US-testing"    = "10.6.0.0/16"
+  }
+}
+
 # Infrastructure for AU Region
 module "vpc_au" {
   for_each                   = toset(var.environments)
@@ -22,10 +35,10 @@ module "vpc_au" {
   }
   source                     = "./modules/VPC"
 
-  vpc_name                   = "vpc-${each.value}"
-  cidr_block                 = "10.1.0.0/16"
-  public_subnet_cidr_blocks  = ["10.1.1.0/24", "10.1.2.0/24"]
-  private_subnet_cidr_blocks = ["10.1.3.0/24", "10.1.4.0/24"]
+  enviroment                 = each.value
+  cidr_block                 = var.vpc_cidr_blocks["AU-${each.value}"]
+  public_subnet_cidr_blocks  = ["${cidrsubnet(var.vpc_cidr_blocks["AU-${each.value}"], 8, 1)}","${cidrsubnet(var.vpc_cidr_blocks["AU-${each.value}"], 8, 2)}"]
+  private_subnet_cidr_blocks = ["${cidrsubnet(var.vpc_cidr_blocks["AU-${each.value}"], 8, 3)}","${cidrsubnet(var.vpc_cidr_blocks["AU-${each.value}"], 8, 4)}"]
 }
 
 module "permission_s3_au" {
@@ -65,10 +78,10 @@ module "vpc_uk" {
   }
   source                     = "./modules/VPC"
   
-  vpc_name                   = "vpc-${each.value}"
-  cidr_block                 = "10.2.0.0/16"
-  public_subnet_cidr_blocks  = ["10.2.1.0/24", "10.2.2.0/24"]
-  private_subnet_cidr_blocks = ["10.2.3.0/24", "10.2.4.0/24"]
+  enviroment                 = each.value
+  cidr_block                 = var.vpc_cidr_blocks["UK-${each.value}"]
+  public_subnet_cidr_blocks  = ["${cidrsubnet(var.vpc_cidr_blocks["UK-${each.value}"], 8, 1)}","${cidrsubnet(var.vpc_cidr_blocks["UK-${each.value}"], 8, 2)}"]
+  private_subnet_cidr_blocks = ["${cidrsubnet(var.vpc_cidr_blocks["UK-${each.value}"], 8, 3)}","${cidrsubnet(var.vpc_cidr_blocks["UK-${each.value}"], 8, 4)}"]
 }
 
 module "permission_s3_uk" {
@@ -108,10 +121,10 @@ module "vpc_us" {
   }
   source                     = "./modules/VPC"
   
-  vpc_name                   = "vpc-${each.value}"
-  cidr_block                 = "10.3.0.0/16"
-  public_subnet_cidr_blocks  = ["10.3.1.0/24", "10.3.2.0/24"]
-  private_subnet_cidr_blocks = ["10.3.3.0/24", "10.3.4.0/24"]
+  enviroment                 = each.value
+  cidr_block                 = var.vpc_cidr_blocks["US-${each.value}"]
+  public_subnet_cidr_blocks  = ["${cidrsubnet(var.vpc_cidr_blocks["US-${each.value}"], 8, 1)}","${cidrsubnet(var.vpc_cidr_blocks["US-${each.value}"], 8, 2)}"]
+  private_subnet_cidr_blocks = ["${cidrsubnet(var.vpc_cidr_blocks["US-${each.value}"], 8, 3)}","${cidrsubnet(var.vpc_cidr_blocks["US-${each.value}"], 8, 4)}"]
 }
 
 module "permission_s3_us" {
