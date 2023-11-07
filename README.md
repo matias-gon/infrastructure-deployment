@@ -1,5 +1,7 @@
-AWS Terraform Environment Setup for Web Application
-Overview
+#AWS Terraform Environment Setup for Web Application
+
+##Overview
+
 This repository contains Terraform configurations to set up a basic AWS environment for a web application. The infrastructure is spread across three AWS regions: Australia (AU), United Kingdom (UK), and United States (US). Each region hosts two separate environments: Production and Testing. The setup includes EC2 instances for hosting the web application and S3 buckets for storage.
 
 Prerequisites

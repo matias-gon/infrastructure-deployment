@@ -1,14 +1,30 @@
-variable "ec2_instance_name" {}
+variable "ec2_instance_name" {
+  description = "Name of the EC2 instance"
+  default     = "ec2-instance"
+}
 
-variable "ec2_instance_type" {}
+variable "ec2_instance_type" {
+  description = "Type of the EC2 instance"
+  default     = "t2.micro"
+}
 
-variable "vpc_id" {}
+variable "vpc_id" {
+  description = "VPC ID"
+}
 
-variable "private_subnet_ids" {}
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs"
+  type        = list(string)
+}
 
-variable "public_subnet_ids" {}
+variable "public_subnet_ids" {
+  description = "List of public subnet IDs"
+  type        = list(string)
+}
 
-variable "iam_instance_profile" {}
+variable "iam_instance_profile" {
+  description = "IAM instance profile"
+}
 
 variable "health_check_path" {
   description = "Health check path for the default target group"

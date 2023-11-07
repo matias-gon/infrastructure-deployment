@@ -20,30 +20,30 @@ resource "aws_s3_bucket" "bucket" {
   }
 }
 
-resource "aws_iam_policy" "bucket-rw-access" {
+resource "aws_iam_policy" "bucket_rw_access" {
   description = "bucket-rw-access-${var.region}-${var.enviroment}"
   name        = "bucket-rw-access-${var.region}-${var.enviroment}"
   policy = jsonencode(
-  {
-  Version    = "2012-10-17"
-  
-  Statement = [
-      {
-        Action   = ["s3:ListBucket"]
-        Effect   = "Allow"
-        Resource = [aws_s3_bucket.bucket.arn]
-      },
-      {
-        Action   = ["s3:GetObject", "s3:PutObject"]
-        Effect   = "Allow"
-        Resource = ["${aws_s3_bucket.bucket.arn}/*"]
-      }
-    ]
-  }
+    {
+      Version = "2012-10-17"
+
+      Statement = [
+        {
+          Action   = ["s3:ListBucket"]
+          Effect   = "Allow"
+          Resource = [aws_s3_bucket.bucket.arn]
+        },
+        {
+          Action   = ["s3:GetObject", "s3:PutObject"]
+          Effect   = "Allow"
+          Resource = ["${aws_s3_bucket.bucket.arn}/*"]
+        }
+      ]
+    }
   )
 }
 
-data aws_iam_policy_document "ec2_assume_role" {
+data "aws_iam_policy_document" "ec2_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -54,7 +54,7 @@ data aws_iam_policy_document "ec2_assume_role" {
   }
 }
 
-resource "aws_iam_role" "role-bucket-access" {
+resource "aws_iam_role" "role_bucket_access" {
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
   name               = "role-bucket-access-${var.region}-${var.enviroment}"
 
@@ -65,41 +65,41 @@ resource "aws_iam_role" "role-bucket-access" {
       Version = "2012-10-17"
       Statement = [
         {
-        "Action": "ec2:*",
-        "Effect": "Allow",
-        "Resource": "*"
-      },
-        {
-            "Effect": "Allow",
-            "Action": "elasticloadbalancing:*",
-            "Resource": "*"
+          "Action" : "ec2:*",
+          "Effect" : "Allow",
+          "Resource" : "*"
         },
         {
-            "Effect": "Allow",
-            "Action": "cloudwatch:*",
-            "Resource": "*"
+          "Effect" : "Allow",
+          "Action" : "elasticloadbalancing:*",
+          "Resource" : "*"
         },
         {
-            "Effect": "Allow",
-            "Action": "autoscaling:*",
-            "Resource": "*"
+          "Effect" : "Allow",
+          "Action" : "cloudwatch:*",
+          "Resource" : "*"
         },
         {
-            "Effect": "Allow",
-            "Action": "iam:CreateServiceLinkedRole",
-            "Resource": "*",
-            "Condition": {
-                "StringEquals": {
-                    "iam:AWSServiceName": [
-                        "autoscaling.amazonaws.com",
-                        "ec2scheduled.amazonaws.com",
-                        "elasticloadbalancing.amazonaws.com",
-                        "spot.amazonaws.com",
-                        "spotfleet.amazonaws.com",
-                        "transitgateway.amazonaws.com"
-                    ]
-                }
+          "Effect" : "Allow",
+          "Action" : "autoscaling:*",
+          "Resource" : "*"
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : "iam:CreateServiceLinkedRole",
+          "Resource" : "*",
+          "Condition" : {
+            "StringEquals" : {
+              "iam:AWSServiceName" : [
+                "autoscaling.amazonaws.com",
+                "ec2scheduled.amazonaws.com",
+                "elasticloadbalancing.amazonaws.com",
+                "spot.amazonaws.com",
+                "spotfleet.amazonaws.com",
+                "transitgateway.amazonaws.com"
+              ]
             }
+          }
         }
       ]
     })
@@ -109,12 +109,12 @@ resource "aws_iam_role" "role-bucket-access" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "role-attachment" {
-  role       = aws_iam_role.role-bucket-access.name
-  policy_arn = aws_iam_policy.bucket-rw-access.arn
+resource "aws_iam_role_policy_attachment" "role_attachment" {
+  role       = aws_iam_role.role_bucket_access.name
+  policy_arn = aws_iam_policy.bucket_rw_access.arn
 }
 
-resource "aws_iam_instance_profile" "ec2-instance-profile" {
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "bucket-access-${var.region}-${var.enviroment}"
-  role = aws_iam_role.role-bucket-access.name
+  role = aws_iam_role.role_bucket_access.name
 }
