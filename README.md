@@ -16,9 +16,13 @@ This repository contains Terraform configurations to set up a basic AWS environm
 *Structure*
 
 The repository is organized with the following directory structure:
-- `modules/`: Contains reusable Terraform modules for VPC, EC2, S3, and IAM permissions.
-- `public-keys/`: Should contain public keys that must be securely provisioned.
+- `modules/`: Contains reusable Terraform modules for Infrastructure, VPC, EC2, S3, and IAM permissions.
+- `public-keys/`: Should contain public keys securely provisioned.
+- - File name format: id_rsa_\<region\>_\<environment\>.pub.
+- - Example: id_rsa_au_prod.pub
 - `user-data/`: Contains PowerShell scripts to pass as user data to EC2 instances on each environment.
+- - File name format: user_data_\<environment\>.ps1
+- - Example: user_data_production.ps1
 - `providers.tf`: Configures the AWS provider for each region.
 - `variables.tf`: Defines variables used across the configurations.
 - `outputs.tf`: Defines the output parameters of the infrastructure.
