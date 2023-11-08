@@ -10,16 +10,16 @@ This repository contains Terraform configurations to set up a basic AWS environm
 
 - AWS Account with read and write access to S3 bucket where the remote state is located. [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#s3-bucket-permissions)
 - AWS Account with read and write access to Dynamodb table where state lock is storage. [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#dynamodb-table-permissions)
-- Terraform v1.0 or newer
+- Terraform v1.6
 - AWS CLI configured with access key, secret key, and a default region
 - Public key file key.pub
 
 *Structure*
 The repository is organized with the following directory structure:
-- modules/: Contains reusable Terraform modules for VPC, EC2, S3, and IAM permissions.
-- providers.tf: Configures the AWS provider for each region.
-- variables.tf: Defines variables used across the configurations.
-- outputs.tf: Defines the output parameters of the infrastructure.
+- `modules/`: Contains reusable Terraform modules for VPC, EC2, S3, and IAM permissions.
+- `providers.tf`: Configures the AWS provider for each region.
+- `variables.tf`: Defines variables used across the configurations.
+- `outputs.tf`: Defines the output parameters of the infrastructure.
 
 *Quick Start*
 
