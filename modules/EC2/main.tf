@@ -44,7 +44,7 @@ resource "aws_security_group" "load_balancer_sg" {
   }
 
   tags = {
-    Name = "load-balancer-security-group-${var.environment}"
+    Name        = "load-balancer-security-group-${var.environment}"
     Environment = var.environment
   }
 }
@@ -72,7 +72,7 @@ resource "aws_security_group" "ec2_sg" {
   }
 
   tags = {
-    Name = "ec2-security-group-${var.environment}"
+    Name        = "ec2-security-group-${var.environment}"
     Environment = var.environment
   }
 }
@@ -110,7 +110,7 @@ resource "aws_alb_target_group" "default_target_group" {
   }
 
   tags = {
-    Name = "${var.ec2_instance_name}-tg-${var.environment}"
+    Name        = "${var.ec2_instance_name}-tg-${var.environment}"
     Environment = var.environment
   }
 }
@@ -124,7 +124,7 @@ resource "aws_lb" "application_load_balancer" {
   subnets            = var.public_subnet_ids
 
   tags = {
-    Name = "${var.ec2_instance_name}-alb-${var.environment}"
+    Name        = "${var.ec2_instance_name}-alb-${var.environment}"
     Environment = var.environment
   }
 }
@@ -148,11 +148,11 @@ resource "aws_launch_template" "ec2" {
   instance_type          = var.ec2_instance_type
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
   key_name               = aws_key_pair.ec2_windows_server_key.key_name
-  
+
   iam_instance_profile {
     name = var.iam_instance_profile
   }
-  
+
 
   block_device_mappings {
     device_name = "/dev/sda1"
@@ -165,20 +165,20 @@ resource "aws_launch_template" "ec2" {
   user_data = filebase64(var.user_data_file)
 
   tags = {
-    Name = "${var.ec2_instance_name}-${var.environment}"
+    Name        = "${var.ec2_instance_name}-${var.environment}"
     Environment = var.environment
   }
 }
 
 # Auto Scaling Group
 resource "aws_autoscaling_group" "ec2_cluster" {
-  name                 = "${var.ec2_instance_name}-auto-scaling-group"
-  min_size             = var.autoscale_min
-  max_size             = var.autoscale_max
-  desired_capacity     = var.autoscale_desired
-  health_check_type    = "EC2"
-  vpc_zone_identifier  = var.private_subnet_ids
-  target_group_arns    = [aws_alb_target_group.default_target_group.arn]
+  name                = "${var.ec2_instance_name}-auto-scaling-group"
+  min_size            = var.autoscale_min
+  max_size            = var.autoscale_max
+  desired_capacity    = var.autoscale_desired
+  health_check_type   = "EC2"
+  vpc_zone_identifier = var.private_subnet_ids
+  target_group_arns   = [aws_alb_target_group.default_target_group.arn]
 
   launch_template {
     id      = aws_launch_template.ec2.id

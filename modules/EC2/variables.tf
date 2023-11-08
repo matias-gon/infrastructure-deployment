@@ -15,7 +15,7 @@ variable "ec2_instance_type" {
 
 variable "pub_key_file" {
   description = "Public key file path"
-  default = "~/.ssh/id_rsa.pub"
+  default     = "~/.ssh/id_rsa.pub"
 }
 
 variable "key_name" {
@@ -58,7 +58,7 @@ variable "autoscale_desired" {
   default     = "1"
 }
 
-variable user_data_file {
+variable "user_data_file" {
   description = "User data file path"
   default     = "./user_data/user-data-dev.ps1"
 }

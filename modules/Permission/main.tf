@@ -46,7 +46,7 @@ resource "aws_iam_policy" "bucket_rw_access" {
   )
 
   tags = {
-    Name = "bucket-rw-access-${var.region}-${var.environment}"
+    Name        = "bucket-rw-access-${var.region}-${var.environment}"
     Environment = "${var.environment}"
   }
 }
@@ -115,7 +115,7 @@ resource "aws_iam_role" "role_bucket_access" {
     })
   }
   tags = {
-    Name = "role-bucket-access-${var.region}-${var.environment}"
+    Name        = "role-bucket-access-${var.region}-${var.environment}"
     Environment = "${var.environment}"
   }
 }
