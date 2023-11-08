@@ -7,16 +7,16 @@ This repository contains Terraform configurations to set up a basic AWS environm
 ![Architecture](https://github.com/matias-gon/infrastructure-deployment/assets/87095214/0e1ef9fa-6f9a-40d8-a3c4-b62beacf28f2)
 
 *Prerequisites*
-
-- AWS Account with read and write access to S3 bucket where the remote state is located. [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#s3-bucket-permissions)
-- AWS Account with read and write access to Dynamodb table where state lock is storage. [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#dynamodb-table-permissions)
-- Terraform v1.6
-- AWS CLI configured with access key, secret key, and a default region
-- Public key file key.pub
+- You need an AWS account with permission to read and write to the S3 bucket for the remote state. [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#s3-bucket-permissions)
+- Ensure your AWS account has the necessary permissions to read and write to the DynamoDB table used for state locking.  [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#dynamodb-table-permissions)
+- Install Terraform version 1.6 or later.
+- Set up the AWS CLI with your credentials and select a default region.
+- Have your public key files ready for use in folder public-keys. These keys must be provisioned through a secure channel.
 
 *Structure*
 The repository is organized with the following directory structure:
 - `modules/`: Contains reusable Terraform modules for VPC, EC2, S3, and IAM permissions.
+- `public-keys`: Should contain public keys that must be securely provisioned.
 - `providers.tf`: Configures the AWS provider for each region.
 - `variables.tf`: Defines variables used across the configurations.
 - `outputs.tf`: Defines the output parameters of the infrastructure.
@@ -48,7 +48,7 @@ terraform output
 ```
 
 *Architecture Design Decisions*
-- Region-Specific Providers: Different AWS providers are configured for each AWS region to comply with the multi-region requirement.
+- Region-Specific Providers: Each AWS region configures different AWS providers to comply with the multi-region requirement.
 - Reusable Modules: The VPC, EC2, and S3 components are abstracted into modules for code reusability and better organization.
 - EC2 Instances: All instances are t2.micro with Windows Server AMIs and 30GB storage, accessible from the public Internet.
 - S3 Buckets: S3 buckets are created in the US region for each environment with read-write (RW) access for the respective EC2 instances.
