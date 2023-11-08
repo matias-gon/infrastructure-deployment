@@ -1,3 +1,8 @@
+variable "environment" {
+  description = "Enviroment"
+  default     = "dev"
+}
+
 variable "ec2_instance_name" {
   description = "Name of the EC2 instance"
   default     = "ec2-instance"
@@ -6,6 +11,15 @@ variable "ec2_instance_name" {
 variable "ec2_instance_type" {
   description = "Type of the EC2 instance"
   default     = "t2.micro"
+}
+
+variable "pub_key_file" {
+  description = "Public key file path"
+  default = "~/.ssh/id_rsa.pub"
+}
+
+variable "key_name" {
+  description = "Name of the key pair"
 }
 
 variable "vpc_id" {

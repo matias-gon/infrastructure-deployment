@@ -23,7 +23,7 @@ data "aws_ami" "ami" {
 
 # ALB Security Group (Traffic Internet -> ALB)
 resource "aws_security_group" "load_balancer_sg" {
-  name        = "load_balancer_security_group"
+  name        = "load-balancer-security-group-${var.environment}"
   description = "Controls access to the ALB"
   vpc_id      = var.vpc_id
 
@@ -32,6 +32,7 @@ resource "aws_security_group" "load_balancer_sg" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTP traffic from anywhere"
   }
 
   egress {
@@ -39,20 +40,22 @@ resource "aws_security_group" "load_balancer_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
   }
 }
 
-# Instance Security group (traffic ALB -> EC2, ssh -> EC2)
+# Instance Security group (traffic ALB -> EC2)
 resource "aws_security_group" "ec2_sg" {
-  name        = "ec2_security_group"
+  name        = "ec2-security-group-${var.environment}"
   description = "Allows inbound access from the ALB only"
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
     security_groups = [aws_security_group.load_balancer_sg.id]
+    description     = "Allow HTTP inbound traffic from the ALB"
   }
 
   egress {
@@ -60,24 +63,24 @@ resource "aws_security_group" "ec2_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
   }
 }
 
 # pub File for AWS Key Pair
-variable "ssh_pubkey_file" {
-  description = "Path to an SSH public key"
-  default     = "~/.ssh/key.pub"
+locals {
+  ssh_pubkey_file = var.pub_key_file
 }
 
 # Key Pair resource
 resource "aws_key_pair" "ec2_windows_server_key" {
-  key_name   = "${var.ec2_instance_name}_key_pair"
-  public_key = file(var.ssh_pubkey_file)
+  key_name   = var.key_name
+  public_key = file(local.ssh_pubkey_file)
 }
 
 # Launch Configuration
 resource "aws_launch_configuration" "ec2" {
-  name                        = "${var.ec2_instance_name}-instances-lc"
+  name_prefix                 = "${var.ec2_instance_name}-${var.environment}"
   image_id                    = data.aws_ami.ami.id
   instance_type               = var.ec2_instance_type
   security_groups             = [aws_security_group.ec2_sg.id]
@@ -98,7 +101,7 @@ resource "aws_launch_configuration" "ec2" {
 
 # Target group
 resource "aws_alb_target_group" "default_target_group" {
-  name     = "${var.ec2_instance_name}-tg"
+  name     = "${var.ec2_instance_name}-tg-${var.environment}"
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -116,7 +119,7 @@ resource "aws_alb_target_group" "default_target_group" {
 
 # Application Load Balancer
 resource "aws_lb" "application_load_balancer" {
-  name               = "${var.ec2_instance_name}-alb"
+  name               = "${var.ec2_instance_name}-alb-${var.environment}"
   load_balancer_type = "application"
   internal           = false
   security_groups    = [aws_security_group.load_balancer_sg.id]
@@ -137,7 +140,7 @@ resource "aws_lb_listener" "front_end" {
 
 # Auto Scaling Group
 resource "aws_autoscaling_group" "ec2_cluster" {
-  name                 = "${var.ec2_instance_name}_auto_scaling_group"
+  name                 = "${var.ec2_instance_name}-auto-scaling-group-${var.environment}"
   min_size             = var.autoscale_min
   max_size             = var.autoscale_max
   desired_capacity     = var.autoscale_desired

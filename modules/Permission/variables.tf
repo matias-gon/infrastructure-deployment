@@ -3,7 +3,7 @@ variable "region" {
   default     = "us-west-2"
 }
 
-variable "enviroment" {
+variable "environment" {
   description = "Enviroment"
   default     = "dev"
 }

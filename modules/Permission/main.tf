@@ -14,18 +14,18 @@ resource "random_id" "example" {
 
 # S3 bucket
 resource "aws_s3_bucket" "bucket" {
-  bucket = "${var.region}-${var.enviroment}-${random_id.example.hex}"
+  bucket = "${var.region}-${var.environment}-${random_id.example.hex}"
 
   tags = {
-    Name        = "${var.region}-${var.enviroment}-${random_id.example.hex}"
-    Environment = "${var.enviroment}"
+    Name        = "${var.region}-${var.environment}-${random_id.example.hex}"
+    Environment = "${var.environment}"
   }
 }
 
 # IAM polcity for S3 bucket access
 resource "aws_iam_policy" "bucket_rw_access" {
-  description = "bucket-rw-access-${var.region}-${var.enviroment}"
-  name        = "bucket-rw-access-${var.region}-${var.enviroment}"
+  description = "bucket-rw-access-${var.region}-${var.environment}"
+  name        = "bucket-rw-access-${var.region}-${var.environment}"
   policy = jsonencode(
     {
       Version = "2012-10-17"
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "ec2_assume_role" {
 # IAM role for EC2 instance
 resource "aws_iam_role" "role_bucket_access" {
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
-  name               = "role-bucket-access-${var.region}-${var.enviroment}"
+  name               = "role-bucket-access-${var.region}-${var.environment}"
 
   inline_policy {
     name = "session-manager"
@@ -110,7 +110,7 @@ resource "aws_iam_role" "role_bucket_access" {
     })
   }
   tags = {
-    Name = "role-bucket-access-${var.region}-${var.enviroment}"
+    Name = "role-bucket-access-${var.region}-${var.environment}"
   }
 }
 
@@ -122,6 +122,6 @@ resource "aws_iam_role_policy_attachment" "role_attachment" {
 
 # IAM instance profile
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "bucket-access-${var.region}-${var.enviroment}"
+  name = "bucket-access-${var.region}-${var.environment}"
   role = aws_iam_role.role_bucket_access.name
 }

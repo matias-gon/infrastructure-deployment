@@ -7,13 +7,13 @@ terraform {
   }
 }
 
-# VPC per enviroment
+# VPC per environment
 resource "aws_vpc" "vpc" {
-  cidr_block           = var.cidr_block # Replace with your desired CIDR block
+  cidr_block           = var.cidr_block 
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
-    Name = "vpc - ${var.enviroment}"
+    Name = "vpc - ${var.environment}"
   }
 }
 
@@ -25,37 +25,37 @@ data "aws_availability_zones" "available" {
 # Create public and private subnets
 resource "aws_subnet" "public_subnet_1" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.public_subnet_cidr_blocks[0] # Replace with your desired CIDR block
+  cidr_block        = var.public_subnet_cidr_blocks[0]
   availability_zone = data.aws_availability_zones.available.names[0]
   tags = {
-    Name = "public_subnet_1_${var.enviroment}"
+    Name = "public_subnet_1_${var.environment}"
   }
 }
 
 resource "aws_subnet" "public_subnet_2" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.public_subnet_cidr_blocks[1] # Replace with your desired CIDR block
+  cidr_block        = var.public_subnet_cidr_blocks[1]
   availability_zone = data.aws_availability_zones.available.names[1]
   tags = {
-    Name = "public_subnet_2_${var.enviroment}"
+    Name = "public_subnet_2_${var.environment}"
   }
 }
 
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.private_subnet_cidr_blocks[0] # Replace with your desired CIDR block
+  cidr_block        = var.private_subnet_cidr_blocks[0]
   availability_zone = data.aws_availability_zones.available.names[0]
   tags = {
-    Name = "private_subnet_1_${var.enviroment}"
+    Name = "private_subnet_1_${var.environment}"
   }
 }
 
 resource "aws_subnet" "private_subnet_2" {
   vpc_id            = aws_vpc.vpc.id
-  cidr_block        = var.private_subnet_cidr_blocks[1] # Replace with your desired CIDR block
-  availability_zone = data.aws_availability_zones.available.names[0]
+  cidr_block        = var.private_subnet_cidr_blocks[1]
+  availability_zone = data.aws_availability_zones.available.names[1]
   tags = {
-    Name = "private_subnet_2_${var.enviroment}"
+    Name = "private_subnet_2_${var.environment}"
   }
 }
 
@@ -72,22 +72,21 @@ resource "aws_nat_gateway" "ngw" {
   allocation_id = aws_eip.nat_gateway.id
   subnet_id     = aws_subnet.public_subnet_1.id
   tags = {
-    Name = "NAT Gateway - ${var.enviroment}"
+    Name = "NAT Gateway - ${var.environment}"
   }
-  depends_on = [aws_eip.nat_gateway]
 }
 
 # Create public and private route tables
 resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name = "public-route-table-${var.enviroment}"
+    Name = "public-route-table-${var.environment}"
   }
 }
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name = "private-route-table-${var.enviroment}"
+    Name = "private-route-table-${var.environment}"
   }
 }
 
