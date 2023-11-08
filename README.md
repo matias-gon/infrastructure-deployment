@@ -2,9 +2,9 @@
 
 *Overview*
 
-This repository contains Terraform configurations to set up a basic AWS environment for a web application. The infrastructure is spread across three AWS regions: Australia (AU), United Kingdom (UK), and United States (US). Each region hosts two separate environments: Production and Testing. The setup includes EC2 instances for hosting the web application and S3 buckets for storage.
+This repository contains Terraform configurations to set up a basic AWS environment for a web application. The infrastructure is spread across three AWS regions: Australia (AU), United Kingdom (UK), and United States (US). Each region hosts two separate environments: Production and Testing. The setup includes EC2 instances for hosting the web application, S3 buckets for storage, and Application Load Balancer for Website publishing.
 
-![Architecture](https://github.com/matias-gon/infrastructure-deployment/assets/87095214/0e1ef9fa-6f9a-40d8-a3c4-b62beacf28f2)
+![Architecture](https://github.com/matias-gon/infrastructure-deployment/assets/87095214/93fae503-8a6a-4b5e-9495-066cdd4e1e12)
 
 *Prerequisites*
 - You need an AWS account with permission to read and write to the S3 bucket for the remote state. [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#s3-bucket-permissions)
@@ -14,6 +14,7 @@ This repository contains Terraform configurations to set up a basic AWS environm
 - Have your public key files ready for use in folder public-keys. These keys must be provisioned through a secure channel.
 
 *Structure*
+
 The repository is organized with the following directory structure:
 - `modules/`: Contains reusable Terraform modules for VPC, EC2, S3, and IAM permissions.
 - `public-keys/`: Should contain public keys that must be securely provisioned.
@@ -64,7 +65,7 @@ terraform output
 
 *Security Best Practices*
 - Minimal IAM Permissions: IAM roles and policies are crafted to grant the least privilege necessary to the EC2 instances.
-- Security Groups: EC2 instances are associated with security groups that strictly allow only HTTP/HTTPS traffic for web access.
+- Security Groups: EC2 instances are associated with security groups that strictly allow only HTTP traffic for web access.
 - Private S3 Buckets: S3 buckets are private with specific EC2 instance access, preventing unauthorized access.
 
 *Contributing*
