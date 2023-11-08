@@ -23,6 +23,14 @@ The repository is organized with the following directory structure:
 
 *Quick Start*
 
+Create public-keys folder
+
+```
+mkdir public-keys
+```
+
+Copy public keys from secure repository
+
 Initialize Terraform: prepares your workspace so Terraform can apply your configuration
 
 ```
