@@ -14,6 +14,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
   tags = {
     Name = "vpc - ${var.environment}"
+    Environment = var.environment
   }
 }
 
@@ -29,6 +30,7 @@ resource "aws_subnet" "public_subnet_1" {
   availability_zone = data.aws_availability_zones.available.names[0]
   tags = {
     Name = "public_subnet_1_${var.environment}"
+    Environment = var.environment
   }
 }
 
@@ -38,6 +40,7 @@ resource "aws_subnet" "public_subnet_2" {
   availability_zone = data.aws_availability_zones.available.names[1]
   tags = {
     Name = "public_subnet_2_${var.environment}"
+    Environment = var.environment
   }
 }
 
@@ -47,6 +50,7 @@ resource "aws_subnet" "private_subnet_1" {
   availability_zone = data.aws_availability_zones.available.names[0]
   tags = {
     Name = "private_subnet_1_${var.environment}"
+    Environment = var.environment
   }
 }
 
@@ -56,12 +60,17 @@ resource "aws_subnet" "private_subnet_2" {
   availability_zone = data.aws_availability_zones.available.names[1]
   tags = {
     Name = "private_subnet_2_${var.environment}"
+    Environment = var.environment
   }
 }
 
 # Create Internet Gateway and NAT Gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name = "IGW - ${var.environment}"
+    Environment = var.environment
+  }
 }
 
 resource "aws_eip" "nat_gateway" {
@@ -73,6 +82,7 @@ resource "aws_nat_gateway" "ngw" {
   subnet_id     = aws_subnet.public_subnet_1.id
   tags = {
     Name = "NAT Gateway - ${var.environment}"
+    Environment = var.environment
   }
 }
 
@@ -81,12 +91,14 @@ resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.vpc.id
   tags = {
     Name = "public-route-table-${var.environment}"
+    Environment = var.environment
   }
 }
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc.id
   tags = {
     Name = "private-route-table-${var.environment}"
+    Environment = var.environment
   }
 }
 

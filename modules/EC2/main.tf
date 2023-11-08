@@ -42,6 +42,11 @@ resource "aws_security_group" "load_balancer_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all outbound traffic"
   }
+
+  tags = {
+    Name = "load-balancer-security-group-${var.environment}"
+    Environment = var.environment
+  }
 }
 
 # Instance Security group (traffic ALB -> EC2)
@@ -65,6 +70,11 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all outbound traffic"
   }
+
+  tags = {
+    Name = "ec2-security-group-${var.environment}"
+    Environment = var.environment
+  }
 }
 
 # pub File for AWS Key Pair
@@ -76,6 +86,10 @@ locals {
 resource "aws_key_pair" "ec2_windows_server_key" {
   key_name   = var.key_name
   public_key = file(local.ssh_pubkey_file)
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 # Target group
@@ -94,6 +108,11 @@ resource "aws_alb_target_group" "default_target_group" {
     interval            = 60
     matcher             = "200"
   }
+
+  tags = {
+    Name = "${var.ec2_instance_name}-tg-${var.environment}"
+    Environment = var.environment
+  }
 }
 
 # Application Load Balancer
@@ -103,6 +122,11 @@ resource "aws_lb" "application_load_balancer" {
   internal           = false
   security_groups    = [aws_security_group.load_balancer_sg.id]
   subnets            = var.public_subnet_ids
+
+  tags = {
+    Name = "${var.ec2_instance_name}-alb-${var.environment}"
+    Environment = var.environment
+  }
 }
 
 # Application Load Balancer Listener
@@ -139,6 +163,11 @@ resource "aws_launch_template" "ec2" {
   }
 
   user_data = filebase64(var.user_data_file)
+
+  tags = {
+    Name = "${var.ec2_instance_name}-${var.environment}"
+    Environment = var.environment
+  }
 }
 
 # Auto Scaling Group
@@ -154,5 +183,11 @@ resource "aws_autoscaling_group" "ec2_cluster" {
   launch_template {
     id      = aws_launch_template.ec2.id
     version = "$Latest"
+  }
+
+  tag {
+    key                 = "Environment"
+    value               = var.environment
+    propagate_at_launch = true
   }
 }
