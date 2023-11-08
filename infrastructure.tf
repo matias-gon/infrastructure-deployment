@@ -77,7 +77,8 @@ module "ec2_au" {
   ec2_instance_name    = "web-${each.value}"
   ec2_instance_type    = var.instance_type["AU-${each.value}"]
   key_name             = "key-au-${each.value}"
-  pub_key_file         = "./public-keys/id_rsa_au_${each.value}.pub"
+  pub_key_file         = "../public-keys/id_rsa_au_${each.value}.pub"
+  user_data_file       = "./user-data/user_data_${each.value}.ps1"
   vpc_id               = module.vpc_au[each.value].vpc_id
   private_subnet_ids   = module.vpc_au[each.value].private_subnet_ids
   public_subnet_ids    = module.vpc_au[each.value].public_subnet_ids
@@ -123,6 +124,7 @@ module "ec2_uk" {
   ec2_instance_type    = var.instance_type["UK-${each.value}"]
   key_name             = "key-uk-${each.value}"
   pub_key_file         = "./public-keys/id_rsa_uk_${each.value}.pub"
+  user_data_file       = "./user-data/user_data_${each.value}.ps1"
   vpc_id               = module.vpc_uk[each.value].vpc_id
   private_subnet_ids   = module.vpc_uk[each.value].private_subnet_ids
   public_subnet_ids    = module.vpc_uk[each.value].public_subnet_ids
@@ -168,9 +170,10 @@ module "ec2_us" {
   ec2_instance_name    = "web-${each.value}"
   key_name             = "key-us-${each.value}"
   pub_key_file         = "./public-keys/id_rsa_us_${each.value}.pub"
+  user_data_file       = "./user-data/user_data_${each.value}.ps1"
   ec2_instance_type    = var.instance_type["US-${each.value}"]
   vpc_id               = module.vpc_us[each.value].vpc_id
   private_subnet_ids   = module.vpc_us[each.value].private_subnet_ids
   public_subnet_ids    = module.vpc_us[each.value].public_subnet_ids
-  iam_instance_profile = module.permission_s3_us[each.value].aws_iam_instance_profile_id
+  iam_instance_profile = module.permission_s3_us[each.value].aws_iam_instance_profile_name
 }

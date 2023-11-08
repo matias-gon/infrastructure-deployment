@@ -57,3 +57,8 @@ variable "autoscale_desired" {
   description = "Desired autoscale (number of EC2)"
   default     = "1"
 }
+
+variable user_data_file {
+  description = "User data file path"
+  default     = "./user_data/user-data-dev.ps1"
+}

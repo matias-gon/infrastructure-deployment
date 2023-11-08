@@ -78,27 +78,6 @@ resource "aws_key_pair" "ec2_windows_server_key" {
   public_key = file(local.ssh_pubkey_file)
 }
 
-# Launch Configuration
-resource "aws_launch_configuration" "ec2" {
-  name_prefix                 = "${var.ec2_instance_name}-${var.environment}"
-  image_id                    = data.aws_ami.ami.id
-  instance_type               = var.ec2_instance_type
-  security_groups             = [aws_security_group.ec2_sg.id]
-  key_name                    = aws_key_pair.ec2_windows_server_key.key_name
-  iam_instance_profile        = var.iam_instance_profile
-  associate_public_ip_address = false
-  root_block_device {
-    volume_size = 30 # It does not allow define a size lesser than 30
-    volume_type = "gp2"
-  }
-  user_data = <<-EOL
-  <powershell>
-  # Install IIS
-  Install-WindowsFeature -name Web-Server -IncludeManagementTools;
-  </powershell>
-  EOL
-}
-
 # Target group
 resource "aws_alb_target_group" "default_target_group" {
   name     = "${var.ec2_instance_name}-tg-${var.environment}"
@@ -138,14 +117,42 @@ resource "aws_lb_listener" "front_end" {
   }
 }
 
+# Launch Template
+resource "aws_launch_template" "ec2" {
+  name_prefix            = "${var.ec2_instance_name}-${var.environment}"
+  image_id               = data.aws_ami.ami.id
+  instance_type          = var.ec2_instance_type
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+  key_name               = aws_key_pair.ec2_windows_server_key.key_name
+  
+  iam_instance_profile {
+    name = var.iam_instance_profile
+  }
+  
+
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      volume_size = 30 # It does not allow define a size lesser than 30
+      volume_type = "gp2"
+    }
+  }
+
+  user_data = filebase64(var.user_data_file)
+}
+
 # Auto Scaling Group
 resource "aws_autoscaling_group" "ec2_cluster" {
-  name                 = "${var.ec2_instance_name}-auto-scaling-group-${var.environment}"
+  name                 = "${var.ec2_instance_name}-auto-scaling-group"
   min_size             = var.autoscale_min
   max_size             = var.autoscale_max
   desired_capacity     = var.autoscale_desired
   health_check_type    = "EC2"
-  launch_configuration = aws_launch_configuration.ec2.name
   vpc_zone_identifier  = var.private_subnet_ids
   target_group_arns    = [aws_alb_target_group.default_target_group.arn]
+
+  launch_template {
+    id      = aws_launch_template.ec2.id
+    version = "$Latest"
+  }
 }
