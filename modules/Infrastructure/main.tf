@@ -13,8 +13,8 @@ module "vpc" {
 
   environment                = var.environment
   cidr_block                 = var.vpc_cidr_block
-  public_subnet_cidr_blocks  = ["${cidrsubnet(var.vpc_cidr_block, 8, 1)}", "${cidrsubnet(var.vpc_cidr_block, 8, 2)}"]
-  private_subnet_cidr_blocks = ["${cidrsubnet(var.vpc_cidr_block, 8, 3)}", "${cidrsubnet(var.vpc_cidr_block, 8, 4)}"]
+  public_subnet_cidr_blocks  = [cidrsubnet(var.vpc_cidr_block, 8, 1), cidrsubnet(var.vpc_cidr_block, 8, 2)]
+  private_subnet_cidr_blocks = [cidrsubnet(var.vpc_cidr_block, 8, 3), cidrsubnet(var.vpc_cidr_block, 8, 4)]
 }
 
 module "permission_s3" {
