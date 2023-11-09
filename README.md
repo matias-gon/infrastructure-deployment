@@ -20,12 +20,13 @@ The repository is organized with the following directory structure:
 - `public-keys/`: Should contain public keys securely provisioned.
   - File name format: id_rsa_\<region\>_\<environment\>.pub.
   - Example: id_rsa_au_production.pub
-- `user-data/`: Contains PowerShell scripts to pass as user data to EC2 instances on each environment.
+- `user-data/`: PowerShell scripts to pass as user data to EC2 instances on each environment.
   - File name format: user_data_\<environment\>.ps1
   - Example: user_data_production.ps1
+- `infrastructure.tf`: Main code for infrastructure deployment.
+- `outputs.tf`: Defines the output parameters of the infrastructure. Shows the ALB's DNS names after the deployment.
 - `providers.tf`: Configures the AWS provider for each region.
-- `variables.tf`: Defines variables used across the configurations.
-- `outputs.tf`: Defines the output parameters of the infrastructure.
+- `remotestate.tf`: Configure the AWS S3 bucket that stores the remote state and the Dynamodb database that keeps state locks.
 
 ## *Quick Start*
 
