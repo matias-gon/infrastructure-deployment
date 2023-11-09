@@ -36,4 +36,12 @@ module "ec2" {
   private_subnet_ids   = module.vpc.private_subnet_ids
   public_subnet_ids    = module.vpc.public_subnet_ids
   iam_instance_profile = module.permission_s3.aws_iam_instance_profile_name
+  environment          = var.environment
+}
+
+module "waf" {
+  source = "../WAF"
+
+  waf_name = "waf-${var.region}-${var.environment}"
+  aws_lb_arn = module.ec2.aws_lb_arn
 }
