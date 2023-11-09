@@ -4,7 +4,7 @@
 
 This repository contains Terraform configurations to set up a basic AWS environment for a web application. The infrastructure is spread across three AWS regions: Australia (AU), United Kingdom (UK), and United States (US). Each region hosts two separate environments: Production and Testing. The setup includes EC2 instances for hosting the web application, S3 buckets for storage, and Application Load Balancer for Website publishing.
 
-![Architecture](https://github.com/matias-gon/infrastructure-deployment/assets/87095214/93fae503-8a6a-4b5e-9495-066cdd4e1e12)
+![Architecture](https://github.com/matias-gon/infrastructure-deployment/assets/87095214/8436972b-c9d4-4e16-a034-e9f08f90ea0b)
 
 ## *Prerequisites*
 - You need an AWS account with permission to read and write to the S3 bucket for the remote state. [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#s3-bucket-permissions)
@@ -16,7 +16,7 @@ This repository contains Terraform configurations to set up a basic AWS environm
 ## *Structure*
 
 The repository is organized with the following directory structure:
-- `modules/`: Contains reusable Terraform modules for Infrastructure, VPC, EC2, S3, and IAM permissions.
+- `modules/`: Contains reusable Terraform modules for Infrastructure, VPC, EC2, WAF, S3, and IAM permissions.
 - `public-keys/`: Should contain public keys securely provisioned.
   - File name format: id_rsa_\<region\>_\<environment\>.pub.
   - Example: id_rsa_au_production.pub
