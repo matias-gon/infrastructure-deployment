@@ -73,7 +73,7 @@ variable "environments" {
   default = ["production", "testing", "QA"]
 }
 ```
--  The new environment CIDR block in the `vpc_cidr_blocks` in `infrastructure.tf` file
+-  The new environment CIDR block in the `vpc_cidr_blocks` in `infrastructure.tf` file for each region
 ```
 variable "vpc_cidr_blocks" {
   type = map(string)
