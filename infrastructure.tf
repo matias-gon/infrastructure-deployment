@@ -7,7 +7,7 @@ terraform {
   }
 }
 
-# environments
+# Define a list of environments
 variable "environments" {
   type    = list(string)
   default = ["production", "testing"]
