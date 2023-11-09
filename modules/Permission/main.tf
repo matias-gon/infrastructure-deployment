@@ -65,65 +65,14 @@ data "aws_iam_policy_document" "ec2_assume_role" {
 
 # IAM role for EC2 instance
 resource "aws_iam_role" "role_bucket_access" {
-  assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
-  name               = "role-bucket-access-${var.region}-${var.environment}"
+  assume_role_policy  = data.aws_iam_policy_document.ec2_assume_role.json
+  name                = "role-bucket-access-${var.region}-${var.environment}"
+  managed_policy_arns = [aws_iam_policy.bucket_rw_access.arn,"arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
 
-  inline_policy {
-    name = "session-manager"
-
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          "Action" : "ec2:*",
-          "Effect" : "Allow",
-          "Resource" : "*"
-        },
-        {
-          "Effect" : "Allow",
-          "Action" : "elasticloadbalancing:*",
-          "Resource" : "*"
-        },
-        {
-          "Effect" : "Allow",
-          "Action" : "cloudwatch:*",
-          "Resource" : "*"
-        },
-        {
-          "Effect" : "Allow",
-          "Action" : "autoscaling:*",
-          "Resource" : "*"
-        },
-        {
-          "Effect" : "Allow",
-          "Action" : "iam:CreateServiceLinkedRole",
-          "Resource" : "*",
-          "Condition" : {
-            "StringEquals" : {
-              "iam:AWSServiceName" : [
-                "autoscaling.amazonaws.com",
-                "ec2scheduled.amazonaws.com",
-                "elasticloadbalancing.amazonaws.com",
-                "spot.amazonaws.com",
-                "spotfleet.amazonaws.com",
-                "transitgateway.amazonaws.com"
-              ]
-            }
-          }
-        }
-      ]
-    })
-  }
   tags = {
     Name        = "role-bucket-access-${var.region}-${var.environment}"
     Environment = var.environment
   }
-}
-
-# IAM role policy attachment
-resource "aws_iam_role_policy_attachment" "role_attachment" {
-  role       = aws_iam_role.role_bucket_access.name
-  policy_arn = aws_iam_policy.bucket_rw_access.arn
 }
 
 # IAM instance profile
