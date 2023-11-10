@@ -2,9 +2,9 @@
 
 ## *Overview*
 
-This repository contains Terraform configurations to set up a basic AWS environment for a web application. The infrastructure is spread across three AWS regions: Australia (AU), United Kingdom (UK), and United States (US). Each region hosts two separate environments: Production and Testing. The setup includes EC2 instances for hosting the web application, S3 buckets for storage, and Application Load Balancer for Website publishing.
+This repository contains Terraform configurations to set up a basic AWS environment for a web application. The infrastructure is spread across three AWS regions: Australia (AU), United Kingdom (UK), and United States (US). Each region hosts two separate environments: Production and Testing. The setup includes EC2 instances for hosting the web application, S3 buckets for storage, and Application Load Balancer for Website publishing behind a WAF.
 
-![Architecture](https://github.com/matias-gon/infrastructure-deployment/assets/87095214/8436972b-c9d4-4e16-a034-e9f08f90ea0b)
+![Architecture](https://github.com/matias-gon/infrastructure-deployment/assets/87095214/98a2f624-d042-43a2-886e-ea4cae63d169)
 
 ## *Prerequisites*
 - You need an AWS account with permission to read and write to the S3 bucket for the remote state. [more info](https://developer.hashicorp.com/terraform/language/settings/backends/s3#s3-bucket-permissions)
@@ -161,7 +161,7 @@ output "alb_dns_name_jp_testing" {
  
 ## *Architecture Design Decisions*
 - Region-Specific Providers: Each AWS region configures different AWS providers to comply with the multi-region requirement.
-- Reusable Modules: The VPC, EC2, and S3 components are abstracted into modules for code reusability and better organization.
+- Reusable Modules: The VPC, EC2, WAF, and S3 components are abstracted into modules for code reusability and better organization.
 - EC2 Instances: All instances are t2.micro with Windows Server AMIs and 30GB storage, accessible from the public Internet.
 - S3 Buckets: S3 buckets are created in the US region for each environment with read-write (RW) access for the respective EC2 instances.
 
@@ -169,6 +169,7 @@ output "alb_dns_name_jp_testing" {
 - Minimal IAM Permissions: IAM roles and policies are crafted to grant the least privilege necessary to the EC2 instances.
 - Security Groups: EC2 instances are associated with security groups that strictly allow only HTTP traffic for web access.
 - Private S3 Buckets: S3 buckets are private with specific EC2 instance access, preventing unauthorized access.
+- A Web Application Firewall is deployed with a set of basic rules in front of the Load Balancer to verify traffic from the Internet.
 
 *Contributing*
 For any changes or improvements, please open an issue first to discuss what you would like to change. Ensure to update tests as appropriate.
